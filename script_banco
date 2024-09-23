@@ -1,0 +1,243 @@
+-- Tabela de Funcionário com endereço integrado
+CREATE TABLE funcionario (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    telefone_1 VARCHAR(13) NOT NULL,
+    telefone_2 VARCHAR(13),
+    logradouro VARCHAR(255) NOT NULL,
+    numero VARCHAR(50) NOT NULL,
+    complemento VARCHAR(255),
+    bairro VARCHAR(100) NOT NULL,
+    cidade VARCHAR(100) NOT NULL,
+    uf VARCHAR(2) NOT NULL,
+    cep VARCHAR(20) NOT NULL
+);
+
+-- Tabela de Médico
+CREATE TABLE medico (
+    medico_id INT PRIMARY KEY,
+    crm VARCHAR(20) UNIQUE NOT NULL,
+    FOREIGN KEY (medico_id) REFERENCES funcionario(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Tabela para armazenar Especialidades (relacionamento N:N com médicos)
+CREATE TABLE especialidade (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE medico_especialidade (
+    medico_id INT NOT NULL,
+    especialidade_id INT NOT NULL,
+    PRIMARY KEY (medico_id, especialidade_id),
+    FOREIGN KEY (medico_id) REFERENCES medico(medico_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (especialidade_id) REFERENCES especialidade(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Tabela de Secretário
+CREATE TABLE secretario (
+    registro_id INT PRIMARY KEY,
+    funcao VARCHAR(255) NOT NULL,
+    FOREIGN KEY (registro_id) REFERENCES funcionario(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Tabela de Insumos com a referência ao secretário
+CREATE TABLE insumos (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL UNIQUE,
+    quantidade INT NOT NULL,
+    validade DATE NOT NULL,
+    data_reposicao DATE NOT NULL,
+    secretario_id INT NOT NULL,
+    FOREIGN KEY (secretario_id) REFERENCES secretario(registro_id) ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- Tabela para armazenar Categorias (relacionamento N:N com insumos)
+CREATE TABLE categoria (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE insumo_categoria (
+    insumo_id INT NOT NULL,
+    categoria_id INT NOT NULL,
+    PRIMARY KEY (insumo_id, categoria_id),
+    FOREIGN KEY (insumo_id) REFERENCES insumos(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (categoria_id) REFERENCES categoria(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Tabela de Paciente com endereço integrado
+CREATE TABLE paciente (
+    cpf VARCHAR(11) PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    email VARCHAR(255),
+    telefone VARCHAR(20) NOT NULL,
+    logradouro VARCHAR(255) NOT NULL,
+    numero VARCHAR(50) NOT NULL,
+    complemento VARCHAR(255),
+    bairro VARCHAR(100) NOT NULL,
+    cidade VARCHAR(100) NOT NULL,
+    uf VARCHAR(2) NOT NULL,
+    cep VARCHAR(20) NOT NULL
+);
+
+-- Tabela de Consultas
+CREATE TABLE consultas (
+    id SERIAL PRIMARY KEY,
+    data_ DATE NOT NULL,
+    horas TIME NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    medico_id INT NOT NULL,
+    paciente_id VARCHAR(11) NOT NULL,
+    FOREIGN KEY (medico_id) REFERENCES medico(medico_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (paciente_id) REFERENCES paciente(cpf) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+
+
+INSERT INTO funcionario (nome, email, telefone_1, telefone_2, logradouro, numero, complemento, bairro, cidade, uf, cep) VALUES
+-- Secretários
+('João Silva', 'joao.silva@example.com', '1234567890', '0987654321', 'Rua A', '123', 'Apto 101', 'Centro', 'São Paulo', 'SP', '00000-000'),
+('Maria Oliveira', 'maria.oliveira@example.com', '2345678901', '1987654321', 'Rua B', '456', '', 'Jardim', 'Rio de Janeiro', 'RJ', '11111-111'),
+('Pedro Santos', 'pedro.santos@example.com', '3456789012', '2987654321', 'Rua C', '789', 'Casa 303', 'Vila', 'Belo Horizonte', 'MG', '22222-222'),
+('Ana Costa', 'ana.costa@example.com', '4567890123', '3987654321', 'Rua D', '101', 'Apto 404', 'Bela Vista', 'Salvador', 'BA', '33333-333'),
+('Carlos Almeida', 'carlos.almeida@example.com', '5678901234', '4987654321', 'Rua E', '202', '', 'Lagoa', 'Curitiba', 'PR', '44444-444'),
+('Patrícia Lima', 'patricia.lima@example.com', '6789012345', '5987654321', 'Rua F', '303', 'Apto 606', 'Praia', 'Porto Alegre', 'RS', '55555-555'),
+('Fernanda Rocha', 'fernanda.rocha@example.com', '7890123456', '6987654321', 'Rua G', '404', 'Casa 707', 'Campo', 'Florianópolis', 'SC', '66666-666'),
+('Roberto Martins', 'roberto.martins@example.com', '8901234567', '7987654321', 'Rua H', '505', 'Apto 808', 'Serra', 'Vitória', 'ES', '77777-777'),
+('Juliana Ferreira', 'juliana.ferreira@example.com', '9012345678', '8987654321', 'Rua I', '606', 'Casa 909', 'Zona Norte', 'Goiânia', 'GO', '88888-888'),
+('Lucas Almeida', 'lucas.almeida@example.com', '0123456789', '9987654321', 'Rua J', '707', 'Apto 010', 'Zona Sul', 'Cuiabá', 'MT', '99999-999'),
+-- Médicos
+('Dr. Paulo Andrade', 'medico1@example.com', '1212121212', '9191919191', 'Rua L', '11', 'Casa 11', 'Centro', 'São Paulo', 'SP', '12345-678'),
+('Dra. Clara Souza', 'medico2@example.com', '1313131313', '9292929292', 'Rua M', '22', 'Casa 22', 'Jardim', 'Rio de Janeiro', 'RJ', '23456-789'),
+('Dr. Eduardo Lima', 'medico3@example.com', '1414141414', '9393939393', 'Rua N', '33', 'Casa 33', 'Vila', 'Belo Horizonte', 'MG', '34567-890'),
+('Dra. Helena Borges', 'medico4@example.com', '1515151515', '9494949494', 'Rua O', '44', 'Casa 44', 'Bela Vista', 'Salvador', 'BA', '45678-901'),
+('Dr. Marcos Tavares', 'medico5@example.com', '1616161616', '9595959595', 'Rua P', '55', 'Casa 55', 'Centro', 'Curitiba', 'PR', '56789-012'),
+('Dra. Aline Castro', 'medico6@example.com', '1717171717', '9696969696', 'Rua Q', '66', 'Casa 66', 'Praia', 'Porto Alegre', 'RS', '67890-123'),
+('Dr. Ricardo Mendes', 'medico7@example.com', '1818181818', '9797979797', 'Rua R', '77', 'Casa 77', 'Campo', 'Florianópolis', 'SC', '78901-234'),
+('Dra. Beatriz Dias', 'medico8@example.com', '1919191919', '9898989898', 'Rua S', '88', 'Casa 88', 'Serra', 'Vitória', 'ES', '89012-345'),
+('Dr. Fernando Gomes', 'medico9@example.com', '2020202020', '9999999999', 'Rua T', '99', 'Casa 99', 'Zona Norte', 'Goiânia', 'GO', '90123-456'),
+('Dra. Camila Azevedo', 'medico10@example.com', '2121212121', '0000000000', 'Rua U', '101', 'Casa 101', 'Zona Sul', 'Cuiabá', 'MT', '01234-567');
+
+
+INSERT INTO medico (medico_id, crm) VALUES
+(11, 'CRM12345'), -- Dr. Paulo Andrade
+(12, 'CRM12346'), -- Dra. Clara Souza
+(13, 'CRM12347'), -- Dr. Eduardo Lima
+(14, 'CRM12348'), -- Dra. Helena Borges
+(15, 'CRM12349'), -- Dr. Marcos Tavares
+(16, 'CRM12350'), -- Dra. Aline Castro
+(17, 'CRM12351'), -- Dr. Ricardo Mendes
+(18, 'CRM12352'), -- Dra. Beatriz Dias
+(19, 'CRM12353'), -- Dr. Fernando Gomes
+(20, 'CRM12354'); -- Dra. Camila Azevedo
+
+
+
+INSERT INTO secretario (registro_id, funcao) VALUES
+(1, 'Secretário de Recepção'), -- João Silva
+(2, 'Secretário de Consultas'), -- Maria Oliveira
+(3, 'Secretário Administrativo'), -- Pedro Santos
+(4, 'Secretário de Atendimento'), -- Ana Costa
+(5, 'Secretário de Atendimento Médico'), -- Carlos Almeida
+(6, 'Secretário de Agendamento'), -- Patrícia Lima
+(7, 'Secretário de Documentação'), -- Fernanda Rocha
+(8, 'Secretário de Registros'), -- Roberto Martins
+(9, 'Secretário de Triagem'), -- Juliana Ferreira
+(10, 'Secretário de Comunicação'); -- Lucas Almeida
+
+
+INSERT INTO especialidade (nome) VALUES
+('Cardiologia'),
+('Neurologia'),
+('Ortopedia'),
+('Pediatria'),
+('Oftalmologia'),
+('Dermatologia'),
+('Ginecologia'),
+('Otorinolaringologia'),
+('Psiquiatria'),
+('Urologia');
+
+
+
+INSERT INTO medico_especialidade (medico_id, especialidade_id) VALUES
+(11, 1), -- Dr. Paulo Andrade é Cardiologista
+(12, 2), -- Dra. Clara Souza é Neurologista
+(13, 3), -- Dr. Eduardo Lima é Ortopedista
+(14, 4), -- Dra. Helena Borges é Pediatra
+(15, 5), -- Dr. Marcos Tavares é Oftalmologista
+(16, 6), -- Dra. Aline Castro é Dermatologista
+(17, 7), -- Dr. Ricardo Mendes é Ginecologista
+(18, 8), -- Dra. Beatriz Dias é Otorinolaringologista
+(19, 9), -- Dr. Fernando Gomes é Psiquiatra
+(20, 10); -- Dra. Camila Azevedo é Urologista
+
+
+INSERT INTO insumos (nome, quantidade, validade, data_reposicao, secretario_id) VALUES
+('Gaze Estéril', 500, '2024-12-31', '2024-11-01', 1), 
+('Algodão Hidrófilo', 300, '2025-01-15', '2024-12-01', 2), 
+('Seringa Descartável 5ml', 1000, '2025-06-20', '2025-05-01', 3), 
+('Luvas Cirúrgicas', 200, '2025-03-30', '2025-02-01', 4), 
+('Agulha Hipodérmica', 1500, '2025-02-28', '2025-01-10', 5), 
+('Esparadrapo Microporoso', 250, '2025-08-30', '2025-07-01', 6), 
+('Compressa de Gaze', 400, '2025-04-15', '2025-03-01', 7), 
+('Soro Fisiológico 500ml', 50, '2024-11-30', '2024-10-15', 8), 
+('Curativo Adesivo', 300, '2024-10-20', '2024-09-01', 9), 
+('Termômetro Digital', 20, '2026-01-01', '2025-12-01', 10);
+
+
+INSERT INTO categoria (nome) VALUES
+('Material de Curativo'),
+('Material Cirúrgico'),
+('Medicamento'),
+('Equipamento'),
+('Material de Limpeza'),
+('Higiene Pessoal'),
+('Instrumento Médico'),
+('Produtos de Diagnóstico'),
+('Materiais para Exames'),
+('Acessórios Médicos');
+
+
+INSERT INTO insumo_categoria (insumo_id, categoria_id) VALUES
+(1, 1), -- Gaze Estéril pertence a Material de Curativo
+(2, 1), -- Algodão Hidrófilo pertence a Material de Curativo
+(3, 2), -- Seringa Descartável 5ml pertence a Material Cirúrgico
+(4, 2), -- Luvas Cirúrgicas pertencem a Material Cirúrgico
+(5, 2), -- Agulha Hipodérmica pertence a Material Cirúrgico
+(6, 1), -- Esparadrapo Microporoso pertence a Material de Curativo
+(7, 1), -- Compressa de Gaze pertence a Material de Curativo
+(8, 3), -- Soro Fisiológico 500ml pertence a Medicamento
+(9, 1), -- Curativo Adesivo pertence a Material de Curativo
+(10, 4); -- Termômetro Digital pertence a Equipamento
+
+
+
+INSERT INTO paciente (cpf, nome, email, telefone, logradouro, numero, complemento, bairro, cidade, uf, cep) VALUES
+('12345678901', 'Lucas Pereira', 'lucas.pereira@example.com', '11987654321', 'Rua A', '123', 'Apto 101', 'Centro', 'São Paulo', 'SP', '00000-000'),
+('23456789012', 'Fernanda Lima', 'fernanda.lima@example.com', '21987654321', 'Rua B', '456', '', 'Jardim', 'Rio de Janeiro', 'RJ', '11111-111'),
+('34567890123', 'Ricardo Silva', 'ricardo.silva@example.com', '31987654321', 'Rua C', '789', 'Casa 303', 'Vila', 'Belo Horizonte', 'MG', '22222-222'),
+('45678901234', 'Juliana Costa', 'juliana.costa@example.com', '71987654321', 'Rua D', '101', 'Apto 404', 'Bela Vista', 'Salvador', 'BA', '33333-333'),
+('56789012345', 'Roberta Santos', 'roberta.santos@example.com', '41987654321', 'Rua E', '202', 'Casa 505', 'Lagoa', 'Curitiba', 'PR', '44444-444'),
+('67890123456', 'Eduardo Martins', 'eduardo.martins@example.com', '51987654321', 'Rua F', '303', 'Apto 606', 'Praia', 'Porto Alegre', 'RS', '55555-555'),
+('78901234567', 'Tatiane Almeida', 'tatiane.almeida@example.com', '61987654321', 'Rua G', '404', 'Casa 707', 'Campo', 'Florianópolis', 'SC', '66666-666'),
+('89012345678', 'Ricardo Ferreira', 'ricardo.ferreira@example.com', '71987654321', 'Rua H', '505', 'Apto 808', 'Serra', 'Vitória', 'ES', '77777-777'),
+('90123456789', 'Camila Castro', 'camila.castro@example.com', '81987654321', 'Rua I', '606', 'Casa 909', 'Zona Norte', 'Goiânia', 'GO', '88888-888'),
+('01234567890', 'Rodrigo Lima', 'rodrigo.lima@example.com', '91987654321', 'Rua J', '707', 'Apto 010', 'Zona Sul', 'Cuiabá', 'MT', '99999-999');
+
+
+
+INSERT INTO consultas (data_, horas, status, medico_id, paciente_id) VALUES
+('2024-09-15', '09:00:00', 'Agendada',  11, '12345678901'), -- Consulta com Dr. Paulo Andrade (Cardiologista) para Lucas Pereira
+('2024-09-16', '10:00:00', 'Concluída',  12, '23456789012'), -- Consulta com Dra. Clara Souza (Neurologista) para Fernanda Lima
+('2024-09-17', '11:00:00', 'Cancelada',  13, '34567890123'), -- Consulta com Dr. Eduardo Lima (Ortopedista) para Ricardo Silva
+('2024-09-18', '14:00:00', 'Em Atendimento',  14, '45678901234'), -- Consulta com Dra. Helena Borges (Pediatra) para Juliana Costa
+('2024-09-19', '15:00:00', 'Agendada',  15, '56789012345'), -- Consulta com Dr. Marcos Tavares (Oftalmologista) para Roberta Santos
+('2024-09-20', '16:00:00', 'Concluída',  16, '67890123456'), -- Consulta com Dra. Aline Castro (Dermatologista) para Eduardo Martins
+('2024-09-21', '17:00:00', 'Em Atendimento',  17, '78901234567'), -- Consulta com Dr. Ricardo Mendes (Ginecologista) para Tatiane Almeida
+('2024-09-22', '09:00:00', 'Agendada',  18, '89012345678'), -- Consulta com Dra. Beatriz Dias (Otorinolaringologista) para Ricardo Ferreira
+('2024-09-23', '10:00:00', 'Cancelada',  19, '90123456789'), -- Consulta com Dr. Fernando Gomes (Psiquiatra) para Camila Castro
+('2024-09-24', '11:00:00', 'Concluída',  20, '01234567890'); -- Consulta com Dra. Camila Azevedo (Urologista) para Rodrigo Lima
+
